@@ -1,0 +1,34 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["**/lib/supabase/admin", "@/lib/supabase/admin"],
+            "message": "Service-role quarantine (SPEC §4.6): the admin client is importable only from webhooks, cron, sso, invite-accept, licence check, org sign-up, admin routes, lib/audit and the upload finaliser."
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/app/api/webhooks/**",
+        "src/app/api/cron/**",
+        "src/app/api/sso/**",
+        "src/app/api/auth/invite/**",
+        "src/app/api/admin/**",
+        "src/app/api/licence/**",
+        "src/app/api/orgs/**",
+        "src/app/api/documents/**/finalise/**",
+        "src/lib/audit.ts"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ]
+}

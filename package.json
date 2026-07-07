@@ -1,0 +1,19 @@
+{
+  "name": "plinth-hub",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/auth-ts"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace apps/hub",
+    "build": "npm run build --workspace @plinth/auth && npm run build --workspace apps/hub",
+    "lint": "npm run lint --workspace apps/hub",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "quarantine-check": "bash scripts/check-service-role-quarantine.sh"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

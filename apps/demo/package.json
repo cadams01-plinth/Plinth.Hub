@@ -1,0 +1,14 @@
+{
+  "name": "apps-demo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs",
+    "start": "node server.mjs",
+    "typecheck": "echo 'demo app: plain JS, nothing to typecheck'"
+  },
+  "dependencies": {
+    "@plinth/auth": "*"
+  }
+}
