@@ -90,7 +90,8 @@ export async function GET(request: NextRequest) {
     if (!sub || !['trialing', 'active'].includes(sub.status)) entitled = Boolean(superAdmin)
   }
   if (!entitled) {
-    return NextResponse.redirect(`${hubUrl}/launcher?seat_needed=${app.slug}`)
+    // SPEC §3 failure UX: unentitled → app detail page with seat guidance.
+    return NextResponse.redirect(`${hubUrl}/apps/${app.slug}?reason=seat_needed`)
   }
 
   // Redirect target: exact match against the app's allowlist only.

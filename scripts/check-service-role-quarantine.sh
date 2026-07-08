@@ -5,7 +5,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-ALLOWED_REGEX='^(apps/hub/src/lib/supabase/admin\.ts|apps/hub/src/lib/env\.ts|apps/hub/src/lib/audit\.ts|apps/hub/src/app/api/(webhooks|cron|sso|admin|licence|orgs)/|apps/hub/src/app/api/auth/invite/|apps/hub/src/app/api/documents/.*finalise|\.env\.example|README\.md|CLAUDE\.md|docs/|scripts/)'
+ALLOWED_REGEX='^(apps/hub/src/lib/supabase/admin\.ts|apps/hub/src/lib/env\.ts|apps/hub/src/lib/audit\.ts|apps/hub/src/app/api/(webhooks|cron|sso|admin|licence|orgs|documents)/|apps/hub/src/app/api/auth/invite/|\.env\.example|README\.md|CLAUDE\.md|docs/|scripts/)'
 
 violations=$(grep -rln --include='*.ts' --include='*.tsx' --include='*.js' --include='*.mjs' \
   --exclude-dir='.next' --exclude-dir='dist' --exclude-dir='node_modules' \

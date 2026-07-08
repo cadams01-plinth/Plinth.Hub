@@ -61,11 +61,13 @@ function SignInForm() {
   )
 }
 
+import { PlinthWordmark } from '@/components/PlinthLogo'
+
 export default function SignInPage() {
   return (
     <>
       <header className="titleblock">
-        <span className="lockup">PLINTH · HUB</span>
+        <PlinthWordmark />
       </header>
       <Suspense>
         <SignInForm />

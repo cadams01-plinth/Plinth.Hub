@@ -3,21 +3,26 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
+    "predev": "node ./scripts/copy-pdf-worker.mjs",
     "dev": "next dev",
+    "prebuild": "node ./scripts/copy-pdf-worker.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.110.0",
     "@plinth/auth": "*",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.45.4",
     "jose": "^5.6.3",
     "next": "^14.2.15",
+    "pdfjs-dist": "^4.6.82",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "server-only": "^0.0.1",
+    "stripe": "^16.12.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

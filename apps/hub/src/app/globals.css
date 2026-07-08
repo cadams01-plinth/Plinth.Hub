@@ -1,20 +1,33 @@
-/* Placeholder design tokens — replace when PLINTH_HUB_BUILD.md §5–6 tokens
-   are restored (see CLAUDE.md). Navy/ink with a titleblock header strip. */
+/* ============================================================
+   Plinth Resource design tokens — from the brand lockup:
+   deep navy field, gold structure, steel-grey hangers, white
+   piers, bearing-pad blue. Titleblock header strip throughout.
+   (Reconstructed pending PLINTH_HUB_BUILD.md §5–6 originals.)
+   ============================================================ */
 :root {
-  --navy: #10233f;
-  --navy-deep: #0a1830;
-  --ink: #1c2431;
-  --paper: #f7f8fa;
-  --line: #d9dee6;
-  --accent: #2f6fed;
-  --accent-ink: #ffffff;
+  --navy: #0d1f3d;
+  --navy-deep: #081527;
+  --navy-soft: #162f52;
+  --gold: #e0a526;
+  --gold-deep: #b9861a;
+  --steel: #b9c0cc;
+  --pier: #f4f5f7;
+  --pad-blue: #3d6bb3;
+  --ink: #1b2534;
+  --muted: #5a6779;
+  --paper: #f6f7f9;
+  --card: #ffffff;
+  --line: #dde2e9;
   --ok: #1a7f4e;
   --warn: #b3540a;
   --danger: #b3261e;
   --radius: 10px;
+  --shadow: 0 1px 3px rgba(13, 31, 61, 0.08), 0 4px 14px rgba(13, 31, 61, 0.06);
 }
 
 * { box-sizing: border-box; }
+
+html, body { height: 100%; }
 
 body {
   margin: 0;
@@ -22,59 +35,115 @@ body {
     Arial, sans-serif;
   background: var(--paper);
   color: var(--ink);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
-a { color: var(--accent); text-decoration: none; }
+a { color: var(--pad-blue); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+h1 { font-size: 1.6rem; letter-spacing: -0.01em; }
+h2 { font-size: 1.2rem; }
+code { background: #eef1f5; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.88em; }
+
+/* ---------- Titleblock (brand header strip) ---------- */
 .titleblock {
   background: var(--navy);
   color: #fff;
-  padding: 0.9rem 1.5rem;
+  padding: 0.65rem 1.4rem;
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  border-bottom: 3px solid var(--gold);
+}
+.titleblock a { color: #fff; }
+.lockup { display: inline-flex; align-items: baseline; gap: 0.5rem; white-space: nowrap; }
+.lockup-plinth { color: var(--gold); font-weight: 800; letter-spacing: 0.28em; }
+.lockup-divider { color: var(--steel); font-weight: 300; }
+.lockup-resource { color: var(--steel); letter-spacing: 0.18em; font-weight: 400; font-size: 0.92em; }
+.titleblock .meta { font-size: 0.85rem; color: var(--steel); text-align: right; }
+.titleblock .meta strong { color: #fff; font-weight: 600; }
+
+/* ---------- App navigation ---------- */
+.appnav {
+  background: var(--navy-deep);
+  padding: 0 1.4rem;
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+}
+.appnav a {
+  color: var(--steel);
+  padding: 0.6rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+}
+.appnav a:hover { color: #fff; text-decoration: none; }
+.appnav a[aria-current='page'] { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ---------- Impersonation banner (AT-11) ---------- */
+.impersonation-banner {
+  background: var(--gold);
+  color: var(--navy-deep);
+  font-weight: 700;
+  padding: 0.5rem 1.4rem;
+  display: flex;
   justify-content: space-between;
   gap: 1rem;
+  font-size: 0.9rem;
 }
-.titleblock .lockup { font-weight: 700; letter-spacing: 0.04em; }
-.titleblock .meta { font-size: 0.85rem; opacity: 0.85; }
 
-.container { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
+/* ---------- Layout ---------- */
+.container { max-width: 1080px; margin: 0 auto; padding: 2rem 1.4rem 4rem; }
+.container.narrow { max-width: 560px; }
+.page-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 
 .card {
-  background: #fff;
+  background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow);
 }
+.card + .card { margin-top: 1rem; }
+.card h2:first-child, .card h3:first-child { margin-top: 0; }
 
 .tile-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1rem;
-  margin-top: 1.5rem;
+  margin-top: 1.25rem;
 }
-
 .tile { display: flex; flex-direction: column; gap: 0.5rem; }
 .tile h3 { margin: 0; font-size: 1.05rem; }
-.tile .one-liner { color: #4a5568; font-size: 0.9rem; flex: 1; }
+.tile .one-liner { color: var(--muted); font-size: 0.9rem; flex: 1; }
 
+/* ---------- Buttons ---------- */
 .btn {
   display: inline-block;
   border: 0;
   border-radius: 8px;
-  padding: 0.55rem 1rem;
+  padding: 0.55rem 1.05rem;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  background: var(--accent);
-  color: var(--accent-ink);
+  background: var(--gold);
+  color: var(--navy-deep);
   text-align: center;
+  text-decoration: none;
 }
+.btn:hover { background: var(--gold-deep); text-decoration: none; color: var(--navy-deep); }
+.btn.navy { background: var(--navy); color: #fff; }
+.btn.navy:hover { background: var(--navy-deep); color: #fff; }
 .btn.secondary { background: #e8edf5; color: var(--navy); }
-.btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--line); }
+.btn.ghost { background: transparent; color: var(--pad-blue); border: 1px solid var(--line); }
+.btn.danger { background: var(--danger); color: #fff; }
+.btn.small { padding: 0.3rem 0.7rem; font-size: 0.8rem; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* ---------- Badges ---------- */
 .badge {
   display: inline-block;
   font-size: 0.72rem;
@@ -87,16 +156,131 @@ a:hover { text-decoration: underline; }
   color: var(--navy);
   width: fit-content;
 }
-.badge.beta { background: #fdf0e3; color: var(--warn); }
+.badge.beta { background: #fdf0dc; color: var(--warn); }
+.badge.gold { background: #fbf1d9; color: var(--gold-deep); }
+.badge.ok { background: #e5f5ec; color: var(--ok); }
+.badge.danger { background: #fdeeee; color: var(--danger); }
+.badge.grey { background: #eef1f5; color: var(--muted); }
 
+/* ---------- Forms ---------- */
 .form-field { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 1rem; }
 .form-field label { font-size: 0.85rem; font-weight: 600; }
-.form-field input {
+.form-field input, .form-field select, .form-field textarea {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 0.55rem 0.75rem;
   font-size: 0.95rem;
+  font-family: inherit;
+  background: #fff;
 }
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+  outline: 2px solid var(--pad-blue);
+  outline-offset: 1px;
+}
+.form-row { display: flex; gap: 0.75rem; align-items: end; flex-wrap: wrap; }
+.form-row .form-field { margin-bottom: 0; flex: 1; min-width: 160px; }
 
-.notice { border-left: 4px solid var(--accent); padding: 0.6rem 1rem; background: #eef3fd; border-radius: 6px; margin: 1rem 0; }
+/* ---------- Notices ---------- */
+.notice { border-left: 4px solid var(--pad-blue); padding: 0.6rem 1rem; background: #eef3fb; border-radius: 6px; margin: 1rem 0; }
 .notice.error { border-color: var(--danger); background: #fdeeee; }
+.notice.ok { border-color: var(--ok); background: #e5f5ec; }
+.notice.warn { border-color: var(--warn); background: #fdf0dc; }
+
+/* ---------- Tables ---------- */
+.table-wrap { overflow-x: auto; }
+table.plinth {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background: var(--card);
+}
+table.plinth th {
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  padding: 0.6rem 0.75rem;
+  border-bottom: 2px solid var(--line);
+}
+table.plinth td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+table.plinth tr:last-child td { border-bottom: 0; }
+
+/* ---------- Storage / usage meters ---------- */
+.meter { background: #e8ecf2; border-radius: 999px; height: 10px; overflow: hidden; }
+.meter > span { display: block; height: 100%; background: var(--pad-blue); border-radius: 999px; }
+.meter > span.warn { background: var(--warn); }
+.meter > span.danger { background: var(--danger); }
+
+/* ---------- Empty / loading states ---------- */
+.empty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--muted);
+}
+.empty h3 { color: var(--ink); margin-bottom: 0.25rem; }
+
+.skeleton {
+  background: linear-gradient(90deg, #eef1f5 25%, #f7f8fa 50%, #eef1f5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 6px;
+  min-height: 1rem;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* ---------- Ask Plinth chat ---------- */
+.chat-thread { display: flex; flex-direction: column; gap: 0.9rem; padding-bottom: 1rem; }
+.chat-msg { max-width: 46rem; padding: 0.7rem 1rem; border-radius: 12px; white-space: pre-wrap; }
+.chat-msg.user { background: var(--navy); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+.chat-msg.assistant { background: var(--card); border: 1px solid var(--line); align-self: flex-start; border-bottom-left-radius: 4px; }
+.confirm-card {
+  border: 1px solid var(--gold);
+  background: #fbf6e8;
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  align-self: flex-start;
+  max-width: 46rem;
+}
+.confirm-card h4 { margin: 0 0 0.4rem; }
+
+/* ---------- PDF viewer ---------- */
+.viewer-shell { display: flex; height: calc(100vh - 110px); background: #454b56; }
+.viewer-rail { width: 148px; overflow-y: auto; background: var(--navy-deep); padding: 0.6rem; display: flex; flex-direction: column; gap: 0.6rem; }
+.viewer-rail canvas { width: 100%; border-radius: 4px; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+.viewer-rail .active canvas { outline: 3px solid var(--gold); }
+.viewer-main { flex: 1; overflow: auto; text-align: center; padding: 1rem 0; }
+.viewer-main canvas { background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.35); margin: 0 auto 1rem; display: block; }
+.viewer-toolbar {
+  background: var(--navy);
+  color: #fff;
+  padding: 0.45rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+}
+.viewer-toolbar select { background: var(--navy-deep); color: #fff; border: 1px solid #2a3c5c; border-radius: 6px; padding: 0.25rem 0.4rem; }
+.viewer-toolbar button { background: transparent; color: var(--steel); border: 1px solid #2a3c5c; border-radius: 6px; padding: 0.25rem 0.6rem; cursor: pointer; }
+.viewer-toolbar button:hover { color: #fff; border-color: var(--steel); }
+
+/* ---------- Marketing ---------- */
+.hero {
+  background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
+  color: #fff;
+  padding: 4rem 1.4rem 4.5rem;
+  text-align: center;
+}
+.hero h1 { font-size: 2.3rem; margin: 1.4rem 0 0.75rem; }
+.hero p { color: var(--steel); max-width: 40rem; margin: 0 auto 1.75rem; font-size: 1.05rem; }
+.hero .gold { color: var(--gold); }
+
+footer.site {
+  background: var(--navy-deep);
+  color: var(--steel);
+  padding: 2rem 1.4rem;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 4rem;
+}
