@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { logAudit } from '@/lib/audit'
+import { safeNext } from '@/lib/safe-redirect'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,23 +24,4 @@ export async function GET(request: NextRequest) {
     }
   }
   return NextResponse.redirect(new URL('/sign-in?error=link_invalid', request.url))
-}
-
-/**
- * Open-redirect-safe resolution of the post-login `next` param. A prefix
- * check like `startsWith('/') && !startsWith('//')` is bypassable: the WHATWG
- * URL parser normalises backslashes to slashes for special schemes, so
- * `/\evil.com` resolves to `https://evil.com/`. Resolve against the request
- * origin and only accept same-origin targets, returning the path+query only.
- */
-function safeNext(next: string, base: string): string {
-  try {
-    const resolved = new URL(next, base)
-    if (resolved.origin === new URL(base).origin) {
-      return resolved.pathname + resolved.search
-    }
-  } catch {
-    // fall through
-  }
-  return '/launcher'
 }
