@@ -26,6 +26,9 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run test --workspace apps/hub
+      - run: npm run build --workspace @plinth/auth
+      # AT-04 (demo leg) + AT-14 SSO replay/expiry against the real demo app.
+      - run: npm run test --workspace apps/demo
       - run: npm run build
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
