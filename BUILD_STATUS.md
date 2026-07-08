@@ -63,16 +63,34 @@ Tracks implementation against SPEC §14 phases. Updated at each push.
   piers on bearing-pad blue. Gold/navy token system, titleblock header strip,
   email header band all matched to the uploaded mark.
 
-## Security review (self-conducted; parallel agents cut short by API limits)
-Two cross-tenant defects found and fixed:
-1. `/api/projects/[id]/members` POST bound `project_id` to the caller's org
-   before insert — the `pmembers_manage` RLS with-check validates only
-   `organisation_id`, so a known foreign project UUID could have granted read
-   access to another org's documents (AT-03). Fixed + added target-member
-   check.
-2. Upload pipeline stamped `ctx.organisationId` on documents/paths/quota; a
-   project member acting outside that project's org context would misfile the
-   document and bill the wrong quota. Now derives tenancy from the project row.
+## Security & correctness review (self-conducted; parallel agents cut short by API limits)
+
+**P0 — RLS infinite recursion (migration 0013).** The spec's `pmembers_manage`
+policy (§2/0005) selects from `project_members` inside a policy *on*
+`project_members` → Postgres "infinite recursion detected". It never surfaced
+in seed/RPC validation (those run as table owner, RLS bypassed) but breaks
+every signed-in request that touches `project_members`: the project page, the
+People page, document uploads (`documents_write` reads it), and project
+updates. Fixed by moving the self-lookup into a `SECURITY DEFINER` helper
+(`auth_is_project_lead`) — the same pattern the spec uses for
+`auth_can_see_project`. Validated as authenticated across owner/lead/viewer:
+selects, doc inserts, project updates, member management all work; viewer
+still blocked from writes.
+
+**Cross-tenant hardening (migration 0012 + route fixes).** The denormalised
+`organisation_id` on child tables wasn't bound to the parent project's org:
+1. `/api/projects/[id]/members` POST now binds `project_id` to the caller's
+   org before insert (RLS with-check validated only `organisation_id`, so a
+   foreign project UUID could have leaked document access — AT-03).
+2. Upload pipeline now derives tenancy from the project row, not the caller's
+   active org context, so a project member acting cross-context can't misfile
+   a document or bill the wrong quota.
+3. **Defense-in-depth:** composite `(child, organisation_id)` foreign keys make
+   an org/project mismatch impossible at the database level regardless of RLS
+   or route code — this alone would have blocked both bugs above.
+
+`supabase/tests/0003_cross_tenant_isolation.sql` (AT-03) locks in the RLS
+visibility split and the composite-FK rejections.
 
 ## Known gaps / next
 - Playwright AT harness (AT-01…AT-15) is specified in SPEC §12 but not yet in
