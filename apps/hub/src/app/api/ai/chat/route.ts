@@ -11,6 +11,7 @@ import {
   SYSTEM_PROMPT,
   executeQueryTool,
 } from '@/lib/ai/tools'
+import { buildAiMessages } from '@/lib/ai/history'
 import { plinthError } from '@/lib/errors'
 
 export const dynamic = 'force-dynamic'
@@ -87,32 +88,7 @@ export async function POST(request: NextRequest) {
     .limit(30)
   const history = (latest ?? []).reverse()
 
-  const messages: Anthropic.MessageParam[] = []
-  for (const m of history) {
-    if (m.role !== 'user' && m.role !== 'assistant') continue
-    const c = m.content as { text?: string; pending_actions?: unknown[] }
-    // An assistant turn that only proposed an act-tool card has empty text but
-    // is still a real turn — replay a placeholder so roles keep alternating
-    // (dropping it would produce two consecutive user turns → Anthropic 400).
-    const text =
-      c?.text ||
-      (m.role === 'assistant' && (c?.pending_actions?.length ?? 0) > 0
-        ? '(Proposed an action for your confirmation.)'
-        : '')
-    if (!text) continue
-    messages.push({ role: m.role, content: text })
-  }
-  // The 30-message window may start on an assistant turn; the API requires the
-  // first message to be 'user'. Trim any leading assistant turns.
-  while (messages.length > 0 && messages[0].role === 'assistant') messages.shift()
-  // Guard alternation at the seam: if the last replayed turn is a user turn
-  // (e.g. an unanswered prior message), fold the new message into it.
-  if (messages.length > 0 && messages[messages.length - 1].role === 'user') {
-    const prev = messages[messages.length - 1]
-    prev.content = `${prev.content as string}\n\n${parsed.data.message}`
-  } else {
-    messages.push({ role: 'user', content: parsed.data.message })
-  }
+  const messages = buildAiMessages(history, parsed.data.message)
 
   await supabase.from('ai_messages').insert({
     conversation_id: conversationId,

@@ -49,22 +49,26 @@ select is(
   (select count(*)::int from documents where id = 'bbbbbbbb-0000-4000-8000-0000000000d1'),
   0, 'org A owner cannot see org B document');
 
--- 4. Composite FK: cannot insert a project_member into org B's project even
---    stamped with org A (the escalation the route fix also blocks).
+-- 4. project_members: with-check passes (org A is the caller's own), so the
+--    composite FK (0012) is the guard and rejects the foreign project with
+--    23503. (4-arg throws_ok: errmsg NULL skips the message check.)
 select throws_ok(
   $$ insert into project_members (project_id, organisation_id, user_id, role)
      values ('bbbbbbbb-0000-4000-8000-0000000000b1',
              'aaaaaaaa-0000-4000-8000-0000000000aa',
              'aaaaaaaa-0000-4000-8000-000000000001', 'lead') $$,
-  '23503', 'composite FK rejects project_member with foreign project + own org');
+  '23503', NULL, 'composite FK rejects project_member with foreign project + own org');
 
--- 5. Composite FK: cannot create a document in org B's project stamped org A.
+-- 5. documents: a foreign owner cannot even SEE org B's project, so
+--    documents_write's auth_can_see_project with-check blocks the insert at
+--    the RLS layer (42501) before the composite FK is reached. Either way the
+--    write is rejected — isolation holds.
 select throws_ok(
   $$ insert into documents (project_id, organisation_id, name, created_by)
      values ('bbbbbbbb-0000-4000-8000-0000000000b1',
              'aaaaaaaa-0000-4000-8000-0000000000aa',
              'sneaky', 'aaaaaaaa-0000-4000-8000-000000000001') $$,
-  '23503', 'composite FK rejects document with foreign project + own org');
+  '42501', NULL, 'RLS blocks a document insert into a foreign project');
 
 -- 6. Matching org is still allowed (no false positive on legitimate writes).
 select lives_ok(
