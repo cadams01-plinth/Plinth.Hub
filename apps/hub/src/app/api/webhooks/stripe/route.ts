@@ -29,9 +29,17 @@ export async function POST(request: NextRequest) {
 
   const admin = createAdminClient()
 
-  // Idempotency: primary-key insert; a duplicate id means already processed.
-  const { error: dupe } = await admin.from('stripe_events').insert({ id: event.id })
-  if (dupe) return NextResponse.json({ received: true, duplicate: true })
+  // Idempotency: primary-key insert. ONLY a unique-violation (23505) means
+  // already-processed → ack. Any other insert error is transient — 500 so
+  // Stripe retries, rather than acking (and permanently dropping) the event.
+  const { error: claimErr } = await admin.from('stripe_events').insert({ id: event.id })
+  if (claimErr) {
+    if (claimErr.code === '23505') {
+      return NextResponse.json({ received: true, duplicate: true })
+    }
+    console.error('stripe_events claim failed (transient)', event.id, claimErr)
+    return NextResponse.json({ error: 'claim failed' }, { status: 500 })
+  }
 
   try {
     switch (event.type) {
@@ -170,15 +178,17 @@ async function onSubscriptionUpdated(admin: SupabaseClient, sub: Stripe.Subscrip
     .eq('organisation_id', row.organisation_id)
     .eq('app_id', row.app_id)
 
+  const { data: org } = await admin
+    .from('organisations')
+    .select('name, settings')
+    .eq('id', row.organisation_id)
+    .single()
+  const settings = { ...((org?.settings as Record<string, unknown>) ?? {}) }
+
   if ((assigned ?? 0) > seats) {
-    const { data: org } = await admin
-      .from('organisations')
-      .select('name, settings')
-      .eq('id', row.organisation_id)
-      .single()
     await admin
       .from('organisations')
-      .update({ settings: { ...(org?.settings ?? {}), seats_over_capacity: true } })
+      .update({ settings: { ...settings, seats_over_capacity: true } })
       .eq('id', row.organisation_id)
     const { data: app } = await admin.from('apps').select('name').eq('id', row.app_id).single()
     const emails = await getOrgAdminEmails(admin, row.organisation_id)
@@ -189,6 +199,11 @@ async function onSubscriptionUpdated(admin: SupabaseClient, sub: Stripe.Subscrip
         detail: `${assigned} people are assigned; the subscription now covers ${seats}.`,
       })
     }
+  } else if (settings.seats_over_capacity) {
+    // Back within capacity (seats added, or assignments dropped) → clear the
+    // sticky flag so the §5 over-capacity banner doesn't latch forever.
+    delete settings.seats_over_capacity
+    await admin.from('organisations').update({ settings }).eq('id', row.organisation_id)
   }
 
   await logAudit({

@@ -19,10 +19,27 @@ export async function GET(request: NextRequest) {
         actorType: 'user',
         action: 'auth.login',
       })
-      // Open-redirect guard: relative paths only
-      const target = next.startsWith('/') && !next.startsWith('//') ? next : '/launcher'
-      return NextResponse.redirect(new URL(target, request.url))
+      return NextResponse.redirect(new URL(safeNext(next, request.url), request.url))
     }
   }
   return NextResponse.redirect(new URL('/sign-in?error=link_invalid', request.url))
+}
+
+/**
+ * Open-redirect-safe resolution of the post-login `next` param. A prefix
+ * check like `startsWith('/') && !startsWith('//')` is bypassable: the WHATWG
+ * URL parser normalises backslashes to slashes for special schemes, so
+ * `/\evil.com` resolves to `https://evil.com/`. Resolve against the request
+ * origin and only accept same-origin targets, returning the path+query only.
+ */
+function safeNext(next: string, base: string): string {
+  try {
+    const resolved = new URL(next, base)
+    if (resolved.origin === new URL(base).origin) {
+      return resolved.pathname + resolved.search
+    }
+  } catch {
+    // fall through
+  }
+  return '/launcher'
 }

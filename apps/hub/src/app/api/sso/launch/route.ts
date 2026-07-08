@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logAudit } from '@/lib/audit'
 import { mintPlt } from '@/lib/sso/plt'
+import { ORG_COOKIE } from '@/lib/org'
 import { publicEnv } from '@/lib/env'
 
 export const dynamic = 'force-dynamic'
@@ -61,9 +62,15 @@ export async function GET(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle()
 
+  // Resolve the acting org exactly as getOrgContext does: the active-org
+  // cookie first, then the profile default, then a sole membership. Without
+  // the cookie a multi-org user working in a non-default org would launch into
+  // the wrong tenant, or (with a stale/empty default) be unable to launch.
+  const cookieOrg = request.cookies.get(ORG_COOKIE)?.value
   const membership =
+    memberships?.find((m) => m.organisation_id === cookieOrg) ??
     memberships?.find((m) => m.organisation_id === profile?.default_organisation_id) ??
-    (memberships?.length === 1 ? memberships[0] : undefined)
+    (memberships && memberships.length >= 1 ? memberships[0] : undefined)
   if (!membership) {
     return NextResponse.redirect(`${hubUrl}/launcher?error=choose_organisation`)
   }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { serverEnv } from '@/lib/env'
+import { cronAuthorised } from '@/lib/cron'
 import { plinthError } from '@/lib/errors'
 
 /**
@@ -8,10 +8,7 @@ import { plinthError } from '@/lib/errors'
  * 25th. The DB function also enables RLS on the new partition (RUNBOOK).
  */
 export async function POST(request: NextRequest) {
-  const { cronSecret } = serverEnv()
-  if (!cronSecret || request.headers.get('authorization') !== `Bearer ${cronSecret}`) {
-    return plinthError('PLINTH_FORBIDDEN')
-  }
+  if (!cronAuthorised(request)) return plinthError('PLINTH_FORBIDDEN')
 
   const admin = createAdminClient()
   const { data, error } = await admin.rpc('create_next_audit_partition')
