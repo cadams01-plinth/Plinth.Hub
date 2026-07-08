@@ -23,7 +23,7 @@
         "src/app/api/admin/**",
         "src/app/api/licence/**",
         "src/app/api/orgs/**",
-        "src/app/api/documents/**/finalise/**",
+        "src/app/api/documents/**",
         "src/lib/audit.ts"
       ],
       "rules": {

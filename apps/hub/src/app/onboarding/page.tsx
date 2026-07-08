@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { PlinthWordmark } from '@/components/PlinthLogo'
 
 function slugify(name: string) {
   return name
@@ -41,7 +42,7 @@ export default function OnboardingPage() {
   return (
     <>
       <header className="titleblock">
-        <span className="lockup">PLINTH · HUB</span>
+        <PlinthWordmark />
         <span className="meta">Set up your workspace</span>
       </header>
       <main className="container" style={{ maxWidth: 520 }}>

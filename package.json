@@ -11,6 +11,7 @@
     "build": "npm run build --workspace @plinth/auth && npm run build --workspace apps/hub",
     "lint": "npm run lint --workspace apps/hub",
     "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspace apps/hub",
     "quarantine-check": "bash scripts/check-service-role-quarantine.sh"
   },
   "engines": {
